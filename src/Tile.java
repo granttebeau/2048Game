@@ -58,7 +58,6 @@ public class Tile extends JFrame {
         value = x;
         number = String.valueOf(value);
         changeColor();
-        repaint();
     }
 
     public int getValue() {
