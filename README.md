@@ -19,4 +19,4 @@ Tests are written using JUnit. To run, go to an IDE and run the tests like norma
 
 ## Acknowledgments
 
-* The CS 2510 professors/TAs for helping me develop the tools to accomplish this
+* The Northeastern CS 2510 professors/TAs for helping me develop the tools to accomplish this
