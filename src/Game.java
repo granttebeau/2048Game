@@ -28,7 +28,7 @@ public class Game extends JFrame {
         // adding tile spaces to the game
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                buttonList.add(new Tile(0, j, i));
+                buttonList.add(new Tile(j, i));
             }
         }
         // setting each spot in the hashmap to false
@@ -36,43 +36,16 @@ public class Game extends JFrame {
             tileIndices.put(i, false);
         }
 
-        buttonList.get(0).changeValue(8);
-        tileIndices.replace(0, true);
-        buttonList.get(1).changeValue(2);
-        tileIndices.replace(1, true);
-        buttonList.get(2).changeValue(2);
-        tileIndices.replace(2, true);
-        buttonList.get(3).changeValue(2);
-        tileIndices.replace(3, true);
-        buttonList.get(4).changeValue(4);
-        tileIndices.replace(4, true);
-        buttonList.get(5).changeValue(2);
-        tileIndices.replace(5, true);
-        buttonList.get(6).changeValue(4);
-        tileIndices.replace(6, true);
-        buttonList.get(7).changeValue(2);
-        tileIndices.replace(7, true);
-        buttonList.get(8).changeValue(2);
-        tileIndices.replace(8, true);
-        buttonList.get(9).changeValue(4);
-        tileIndices.replace(9, true);
-        buttonList.get(10).changeValue(2);
-        tileIndices.replace(10, true);
-        buttonList.get(11).changeValue(4);
-        tileIndices.replace(11, true);
-        buttonList.get(12).changeValue(4);
-        tileIndices.replace(12, true);
-        buttonList.get(13).changeValue(2);
-        tileIndices.replace(13, true);
-        buttonList.get(14).changeValue(4);
-        tileIndices.replace(14, true);
-        buttonList.get(15).changeValue(2);
-        tileIndices.replace(15, true);
-
-
         // generates two random spots at the beginning of the game
         //getRandomSpot();
         //getRandomSpot();
+
+        buttonList.get(0).changeValue(8);
+        tileIndices.replace(0, true);
+        buttonList.get(1).changeValue(4);
+        tileIndices.replace(1, true);
+        buttonList.get(3).changeValue(8);
+        tileIndices.replace(3, true);
 
         // sets the color, font, and size parameters  for the game
         setBackground(Color.decode("#717171"));
@@ -99,11 +72,11 @@ public class Game extends JFrame {
                 else if (e.getKeyCode() == KeyEvent.VK_DOWN && !gameWon && !gameLost) {
                     move(DOWN); // 4 is down
                 }
-                else if (e.getKeyCode() == KeyEvent.VK_SPACE && (gameWon || gameLost)) {
+                else if (e.getKeyCode() == KeyEvent.VK_ENTER && (gameWon || gameLost)) {
                     // adding tile spaces to the game
                     for (int i = 0; i < 4; i++) {
                         for (int j = 0; j < 4; j++) {
-                            buttonList.set((i * 4) + j, new Tile(0, j, i));
+                            buttonList.set((i * 4) + j, new Tile(j, i));
                         }
                     }
                     // setting each spot in the hashmap to false
@@ -114,6 +87,9 @@ public class Game extends JFrame {
                     gameWon = false;
                     getRandomSpot();
                     getRandomSpot();
+
+                    getContentPane().invalidate();
+                    getContentPane().validate();
                     repaint();
 
                 }
@@ -130,8 +106,12 @@ public class Game extends JFrame {
     @Override
     // animates the game
     public void paint(Graphics g) {
-        g.setColor(Color.decode("#919191"));
+
         int size = 125; // screen size divided by four
+
+        g.setColor(Color.decode("#717171"));
+        g.fillRect(30, 45, 500, 500);
+        g.setColor(Color.decode("#919191"));
 
         // sets up each tile space
         for (int i = 0; i < 4; i++) {
@@ -148,16 +128,19 @@ public class Game extends JFrame {
         }
 
         if (gameWon) {
-            g.setColor(Color.decode("#717171"));
-            g.fillRect(132, 145, 250, 250);
+            g.setColor(Color.decode("#aaaaaa"));
+            g.fillRect(50, 125, 425, 300);
             g.setColor(Color.black);
             g.drawString("You Won!", 200, 250);
+            g.drawString("Click return to start a new game", 60, 300);
+
         }
         else if (gameLost) {
-            g.setColor(Color.decode("#717171"));
-            g.fillRect(132, 145, 250, 250);
+            g.setColor(Color.decode("#aaaaaa"));
+            g.fillRect(85, 125, 350, 300);
             g.setColor(Color.black);
             g.drawString("You Lost", 200, 250);
+            g.drawString("Click return to play again", 100, 300);
         }
     }
 
@@ -179,36 +162,39 @@ public class Game extends JFrame {
         int firstTileNum = rand.nextInt(emptyTiles.size()); // gets a random number with a bound of the size of the empty tiles list
         int tileNum = emptyTiles.get(firstTileNum); // uses firstTileNum as the index to get an empty spot
 
-        tileIndices.replace(firstTileNum, true); // records the new tile in tileIndices
+        tileIndices.replace(tileNum, true); // records the new tile in tileIndices
         Tile t = buttonList.get(tileNum); // gets the tile from the list of game tiles
 
         var value = Math.random() < 0.9 ? 2 : 4; // if the random number generated is greater than .9, the value is a 4
         t.changeValue(value); // changes its value to 2
     }
 
-    // returns whether or not all the tiles are full
+    // returns whether or not all of the tiles are full
     private boolean tilesFull() {
-        int num = 0;
+        int numEmptyTiles = 0;
         for (int i = 0; i < 16; i++) {
-            if (!tileIndices.get(i)) {
-                num++;
+            boolean pass = tileIndices.get(i);
+            if (!pass) {
+                numEmptyTiles++;
             }
         }
-        return num == 0;
+        return numEmptyTiles == 0; // returns whether the number of empty tiles equals 0
     }
 
     // ends the game when it's appropriate
     private void isEndGame() {
         boolean isEnd = true;
 
+        // checks each row and column if there is a move that can be made
         for (int i = 0; i < 4; i++) {
-            isEnd = canMove(i, 1) && canMove(i * 4, 2)
-                    && canMove(i * 4, 3) && canMove(i, 4) && isEnd;
+            isEnd = canMove(i, true) && canMove(i * 4, false) && isEnd;
         }
 
+        // if the game has been won, set gameWon to true
         if (wonGame()) {
             gameWon = true;
         }
+        // if there are no empty tiles and isEnd is true, set gameLost to true
         else if (tilesFull() && isEnd) {
             gameLost = true;
         }
@@ -227,20 +213,17 @@ public class Game extends JFrame {
     }
 
     // returns true if the player can make a move at any given time
-    private boolean canMove(int ind, int dir) {
+    private boolean canMove(int ind, boolean upOrDown) {
         // initializes i1, i2, and i3, which are the indices used to figure out how far the value should be placed
-        int i1 = -1;
-        int i2 = -1;
-        int i3 = -1;
-        int i4 = -1;
+        int i1, i2, i3, i4;
 
-        if (dir == UP || dir == DOWN) { // if the direction is up, the indices to check are the top three in the respective column
+        if (upOrDown) { // if the direction is up, the indices to check are the top three in the respective column
             i1 = ind;
             i2 = ind + 4;
             i3 = ind + 8;
             i4 = ind + 12;
         }
-        else if (dir == LEFT || dir == RIGHT) { // if the direction is left, the indices to check are the first three in the respective row
+        else { // if the direction is left, the indices to check are the first three in the respective row
             i1 = ind;
             i2 = ind + 1;
             i3 = ind + 2;
@@ -259,8 +242,8 @@ public class Game extends JFrame {
         int intT3 = t3.getValue();
         int intT4 = t4.getValue();
 
-        return intT1 > 0 && intT2 > 0 && intT3 > 0 && intT4 > 0
-                && intT1 != intT2 && intT2 != intT3 && intT3 != intT4;
+
+        return intT1 != intT2 && intT2 != intT3 && intT3 != intT4; // checks if none of the values equal each other
     }
 
 
@@ -328,337 +311,174 @@ public class Game extends JFrame {
     private void move(int dir) {
         boolean moved = false; // used to check whether or not a new random tile should be generated
 
-        if (dir == UP) {
-            for (int i = 0; i < 4; i++) {
-                int ind = 0;
-                int newVal;
-                boolean pastOne = false;
-                int carryVal = -1;
-                while (ind < 3) {
-                    int col = ind * 4;
-                    Tile t1 = buttonList.get(col + i);
-                    Tile t2 = buttonList.get(col + i + 4);
-                    int t1Val = t1.getValue();
-                    int t2Val = t2.getValue();
+        // for 4 rows/columns
+        for (int i = 0; i < 4; i++) {
+            int ind; // the current index
+            int newVal; // the new value being created
+            boolean pastOne = false; // checks to see whether the algorithm is past the first tile
+            int carryVal = -1; // a value used if there are any carry over values
+            int setFarVal; // value that keeps track of what number should go into setFarthest
+            boolean isRising; // represents whether the while loop should be rising or not
 
-                    if (carryVal == t1Val ^ carryVal == t2Val) {
-                        newVal = carryVal * 2;
-                        if (carryVal == t1Val) {
-                            t1.changeValue(0);
-                            tileIndices.replace(col + i, false);
-                        } else {
-                            t2.changeValue(0);
-                            tileIndices.replace(col + i + 4, false);
+            // sets the ind, isRising, and setFarVal parameters for each direction
+            if (dir == UP) {
+                ind = 0;
+                isRising = true;
+                setFarVal = i;
+            }
+            else if (dir == RIGHT){
+                ind = 3;
+                isRising = false;
+                setFarVal = i * 4;
+            }
+            else if (dir == LEFT) {
+                ind = 0;
+                isRising = true;
+                setFarVal = i * 4;
+            }
+            else {
+                ind = 3;
+                isRising = false;
+                setFarVal = i;
+            }
+
+            // while ind is within its appropriate limit
+            while (checkLimit(ind, isRising)) {
+                int t1Ind, t2Ind;
+
+                // sets t1Ind and t2Ind to their appropriate values. these represent
+                // where in the buttonList that Tiles t1 and t2 will be found
+                if (dir == UP) {
+                    t1Ind = (ind * 4) + i;
+                    t2Ind = (ind * 4) + i + 4;
+                }
+                else if (dir == RIGHT) {
+                    t1Ind = (i * 4) + ind;
+                    t2Ind = (i * 4) + ind - 1;
+                }
+                else if (dir == LEFT) {
+                    t1Ind = (i * 4) + ind;
+                    t2Ind = (i * 4) + ind + 1;
+                }
+                else {
+                    t1Ind = (ind * 4) + i;
+                    t2Ind = (ind * 4) + i - 4;
+                }
+
+                // initializes the two tiles that are being looked at
+                Tile t1 = buttonList.get(t1Ind);
+                Tile t2 = buttonList.get(t2Ind);
+
+                // gets the values of the two tiles
+                int t1Val = t1.getValue();
+                int t2Val = t2.getValue();
+
+                // if the carry over value is equal to either of the values
+                if (carryVal == t1Val ^ carryVal == t2Val) {
+                    newVal = carryVal * 2; // sets the new value
+                    if (carryVal == t1Val) { // if it's equal to t1Val
+                        t1.changeValue(0); // change the value of t1 to 0 and replace it in tileIndices
+                        tileIndices.replace(t1Ind, false);
+                    } else { // if it's equal to t2Val
+                        t2.changeValue(0);// change the value of t1 to 0 and replace it in tileIndices
+                        tileIndices.replace(t2Ind, false);
+                    }
+                    setFarthest(setFarVal, newVal, dir); // place the newVal farthest to the given direction
+                    carryVal = -1; // reset the carryVal
+                }
+                // if the two values are equal to each other
+                else if (t1Val == t2Val && t1Val > 0) {
+                    newVal = t1Val * 2; // sets the new value
+
+                    // changes each of their values, and then replaces their booleans in tileIndices
+                    t1.changeValue(0);
+                    t2.changeValue(0);
+                    tileIndices.replace(t1Ind, false);
+                    tileIndices.replace(t2Ind, false);
+
+                    setFarthest(setFarVal, newVal, dir); // place the newVal farthest to the given direction
+                    moved = true;
+                }
+                // if the while loop is in its last iteration and one of the values or carryVal is greater than 0
+                else if (checkAlmost(ind, isRising) && ((t1Val > 0 ^ t2Val > 0) || carryVal > 0)) {
+                    if (t2Val == carryVal) { // if t2 and carryVal are equal
+                        newVal = carryVal * 2; // sets the new value
+                        setFarthest(setFarVal, newVal, dir); // place the newVal farthest to the given direction
+                        t2.changeValue(0); // changes the value of t2 and replaces it in tileIndicies
+                        tileIndices.replace(t2Ind, false);
+                        moved = true;
+                    }
+                    else {
+                        if (carryVal > 0) { // if carryVal is greater than 0, place it farthest to the given direction
+                            setFarthest(setFarVal, carryVal, dir);
                         }
-                        setFarthest(i, newVal, UP);
-                        carryVal = -1;
-                        moved = true;
-                    }
-                    else if (t1Val == t2Val && t1Val > 0) {
-                        newVal = t1Val * 2;
-                        t1.changeValue(0);
-                        t2.changeValue(0);
-                        tileIndices.replace(col + i, false);
-                        tileIndices.replace(col + i + 4, false);
-                        setFarthest(i, newVal, UP);
-                        moved = true;
-                    }
-                    else if (ind == 2 && ((t1Val > 0 ^ t2Val > 0) || carryVal > 0)) {
-                        if (t2Val == carryVal) {
-                            newVal = carryVal * 2;
-                            setFarthest(i, newVal, UP);
-                            t2.changeValue(0);
-                            tileIndices.replace(col + i + 4, false);
+                        if (t2Val > 0) { // if t2Val is greater than 0, place it farthest to the given direction
+                            setFarthest(setFarVal, t2Val, dir);
+                            t2.changeValue(0); // changes value of t2 and replaces it in tileIndices
+                            tileIndices.replace(t2Ind, false);
                             moved = true;
                         }
-                        else {
-                            if (carryVal > 0) {
-                                setFarthest(i, carryVal, UP);
-                            }
-                            if (t2Val > 0) {
-                                setFarthest(i, t2Val, UP);
-                                t2.changeValue(0);
-                                tileIndices.replace(col + i + 4, false);
-                                moved = true;
-                            }
-                        }
-
                     }
-                    else if (t1Val == 0 && t2Val > 0) {
-                        if (carryVal > 0) {
-                            setFarthest(i, carryVal, UP);
-                        }
-                        carryVal = t2.getValue();
-                        t2.changeValue(0);
-                        tileIndices.replace(col + i + 4, false);
+                }
+                // if t2Val is the only one greater than 0
+                else if (t1Val == 0 && t2Val > 0) {
+                    if (carryVal > 0) { // if carryVal isn't -1, set it the farthest to the given direction
+                        setFarthest(setFarVal, carryVal, dir);
+                    }
+                    carryVal = t2Val; // sets a new value for carryVal
+                    t2.changeValue(0); // changes the value of t2 and replaces it in tileIndices
+                    tileIndices.replace(t2Ind, false);
+                    moved = true;
+                }
+                // if t1Val is the only one greater than 0
+                else if (t1Val > 0 && t2Val == 0) {
+                    if (carryVal > 0) { // if carryVal isn't -1, set it the farthest to the given direction
+                        setFarthest(setFarVal, carryVal, dir);
+                    }
+                    if (!pastOne) { // if the loop isn't on its first iteration, set moved equal to true
                         moved = true;
                     }
-                    else if (t1Val > 0 && t2Val == 0) {
-                        if (carryVal > 0) {
-                            setFarthest(i, carryVal, UP);
-                        }
-                        if (ind > 0 && !pastOne) {
-                            moved = true;
-                        }
-                        carryVal = t1.getValue();
-                        t1.changeValue(0);
-                        tileIndices.replace(col + i, false);
-                    }
+                    carryVal = t1Val; // sets a new value for carryVal
+                    t1.changeValue(0); // changes the value of t1 and replaces it in tileIndices
+                    tileIndices.replace(t1Ind, false);
+                }
+
+                // moves the loop on based on whether or not it's rising
+                if (isRising) {
                     ind++;
-                    pastOne = true;
                 }
-            }
-        }
-
-        else if (dir == RIGHT) {
-            for (int i = 0; i < 4; i++) {
-                int ind = 3;
-                int newVal;
-                boolean pastOne = false;
-                int carryVal = -1;
-                while (ind > 0) {
-                    Tile t1 = buttonList.get((i * 4) + ind);
-                    Tile t2 = buttonList.get((i * 4) + ind - 1);
-                    int t1Val = t1.getValue();
-                    int t2Val = t2.getValue();
-
-                    if (carryVal == t1Val ^ carryVal == t2Val) {
-                        newVal = carryVal * 2;
-                        if (carryVal == t1Val) {
-                            t1.changeValue(0);
-                            tileIndices.replace((i * 4) + ind, false);
-                        } else {
-                            t2.changeValue(0);
-                            tileIndices.replace((i * 4) + ind - 1, false);
-                        }
-                        setFarthest(i * 4, newVal, RIGHT);
-                        carryVal = -1;
-                        moved = true;
-                    }
-                    else if (t1Val == t2Val && t1Val > 0) {
-                        newVal = t1Val * 2;
-                        t1.changeValue(0);
-                        t2.changeValue(0);
-                        tileIndices.replace((i * 4) + ind, false);
-                        tileIndices.replace((i * 4) + ind - 1, false);
-                        setFarthest(i * 4, newVal, RIGHT);
-                        moved = true;
-                    }
-                    else if (ind == 1 && ((t1Val > 0 ^ t2Val > 0) || carryVal > 0)) {
-                        if (t2Val == carryVal) {
-                            newVal = carryVal * 2;
-                            setFarthest(i * 4, newVal, RIGHT);
-                            t2.changeValue(0);
-                            tileIndices.replace((i * 4) + ind - 1, false);
-                            moved = true;
-                        }
-                        else {
-                            if (carryVal > 0) {
-                                setFarthest(i * 4, carryVal, RIGHT);
-                            }
-                            if (t2Val > 0) {
-                                setFarthest(i * 4, t2Val, RIGHT);
-                                t2.changeValue(0);
-                                tileIndices.replace((i * 4) + ind - 1, false);
-                                moved = true;
-
-                            }
-                        }
-
-                    }
-                    else if (t1Val == 0 && t2Val > 0) {
-                        if (carryVal > 0) {
-                            setFarthest(i * 4, carryVal, RIGHT);
-                        }
-                        carryVal = t2.getValue();
-                        t2.changeValue(0);
-                        tileIndices.replace((i * 4) + ind - 1, false);
-                        moved = true;
-                    }
-                    else if (t1Val > 0 && t2Val == 0) {
-                        if (carryVal > 0) {
-                            setFarthest(i * 4, carryVal, RIGHT);
-                        }
-                        if (ind < 3 && !pastOne) {
-                            moved = true;
-                        }
-                        carryVal = t1.getValue();
-                        t1.changeValue(0);
-                        tileIndices.replace((i * 4) + ind, false);
-                    }
+                else {
                     ind -= 1;
-                    pastOne = true;
                 }
-            }
-        }
-        else if (dir == LEFT) {
-            for (int i = 0; i < 4; i++) {
-                int ind = 0;
-                int newVal;
-                boolean pastOne = false;
-                int carryVal = -1;
-                while (ind < 3) {
-                    Tile t1 = buttonList.get((i * 4) + ind);
-                    Tile t2 = buttonList.get((i * 4) + ind + 1);
-                    int t1Val = t1.getValue();
-                    int t2Val = t2.getValue();
 
-                    if (carryVal == t1Val ^ carryVal == t2Val) {
-                        newVal = carryVal * 2;
-                        if (carryVal == t1Val) {
-                            t1.changeValue(0);
-                            tileIndices.replace((i * 4) + ind, false);
-                        } else {
-                            t2.changeValue(0);
-                            tileIndices.replace((i * 4) + ind + 1, false);
-                        }
-                        setFarthest(i * 4, newVal, LEFT);
-                        carryVal = -1;
-                        moved = true;
-                    }
-                    else if (t1Val == t2Val && t1Val > 0) {
-                        newVal = t1Val * 2;
-                        t1.changeValue(0);
-                        t2.changeValue(0);
-                        tileIndices.replace((i * 4) + ind, false);
-                        tileIndices.replace((i * 4) + ind + 1, false);
-                        setFarthest(i * 4, newVal, LEFT);
-                        moved = true;
-                    }
-                    else if (ind == 2 && ((t1Val > 0 ^ t2Val > 0) || carryVal > 0)) {
-                        if (t2Val == carryVal) {
-                            newVal = carryVal * 2;
-                            setFarthest(i * 4, newVal, LEFT);
-                            t2.changeValue(0);
-                            tileIndices.replace((i * 4) + ind + 1, false);
-                            moved = true;
-                        }
-                        else {
-                            if (carryVal > 0) {
-                                setFarthest(i * 4, carryVal, LEFT);
-                            }
-                            if (t2Val > 0) {
-                                t2.changeValue(0);
-                                setFarthest(i * 4, t2Val, LEFT);
-                                tileIndices.replace((i * 4) + ind + 1, false);
-                                moved = true;
-                            }
-                        }
-
-                    }
-                    else if (t1Val == 0 && t2Val > 0) {
-                        if (carryVal > 0) {
-                            setFarthest(i * 4, carryVal, LEFT);
-                        }
-                        carryVal = t2.getValue();
-                        t2.changeValue(0);
-                        tileIndices.replace((i * 4) + ind + 1, false);
-                        moved = true;
-                    }
-                    else if (t1Val > 0 && t2Val == 0) {
-                        if (carryVal > 0) {
-                            setFarthest(i * 4, carryVal, LEFT);
-                        }
-                        if (ind > 0 && !pastOne) {
-                            moved = true;
-                        }
-                        carryVal = t1.getValue();
-                        t1.changeValue(0);
-                        tileIndices.replace((i * 4) + ind, false);
-                    }
-                    ind++;
-                    pastOne = true;
-                }
+                // signals that the loop is past the first tile
+                pastOne = true;
             }
         }
 
-        else if (dir == DOWN) {
-            for (int i = 0; i < 4; i++) {
-                int ind = 3;
-                int newVal;
-                boolean pastOne = false;
-                int carryVal = -1;
-                while (ind > 0) {
-                    int col = ind * 4;
-                    Tile t1 = buttonList.get(col + i);
-                    Tile t2 = buttonList.get((col + i) - 4);
-                    int t1Val = t1.getValue();
-                    int t2Val = t2.getValue();
-
-                    if (carryVal == t1Val ^ carryVal == t2Val) {
-                        newVal = carryVal * 2;
-                        if (carryVal == t1Val) {
-                            t1.changeValue(0);
-                            tileIndices.replace(col + i, false);
-                        } else {
-                            t2.changeValue(0);
-                            tileIndices.replace(col + i - 4, false);
-                        }
-                        setFarthest(i, newVal, DOWN);
-                        carryVal = -1;
-                        moved = true;
-                    }
-                    else if (t1Val == t2Val && t1Val > 0) {
-                        newVal = t1Val * 2;
-                        t1.changeValue(0);
-                        t2.changeValue(0);
-                        tileIndices.replace(col + i, false);
-                        tileIndices.replace(col + i - 4, false);
-                        setFarthest(i, newVal, DOWN);
-                        moved = true;
-                    }
-                    else if (ind == 1 && ((t1Val > 0 ^ t2Val > 0) || carryVal > 0)) {
-                        if (t2Val == carryVal) {
-                            newVal = carryVal * 2;
-                            setFarthest(i, newVal, DOWN);
-                            t2.changeValue(0);
-                            tileIndices.replace(col + i - 4, false);
-                            moved = true;
-                        }
-                        else {
-                            if (carryVal > 0) {
-                                setFarthest(i, carryVal, DOWN);
-                            }
-                            if (t2Val > 0) {
-                                setFarthest(i, t2Val, DOWN);
-                                t2.changeValue(0);
-                                tileIndices.replace(col + i - 4, false);
-                                moved = true;
-                            }
-                        }
-
-                    }
-                    else if (t1Val == 0 && t2Val > 0) {
-                        if (carryVal > 0) {
-                            setFarthest(i, carryVal, DOWN);
-                        }
-                        carryVal = t2.getValue();
-                        t2.changeValue(0);
-                        tileIndices.replace(col + i - 4, false);
-                        moved = true;
-                    }
-                    else if (t1Val > 0 && t2Val == 0) {
-                        if (carryVal > 0) {
-                            setFarthest(i, carryVal, DOWN);
-                        }
-                        if (ind < 3 && !pastOne) {
-                            moved = true;
-                        }
-                        carryVal = t1.getValue();
-                        t1.changeValue(0);
-                        tileIndices.replace(col + i, false);
-                    }
-                    ind -= 1;
-                    pastOne = true;
-                }
-            }
-        }
-
-        if (moved) {
+        if (moved) { // if there has been a move, get a random spot
             getRandomSpot();
         }
-        repaint();
-        isEndGame();
+        isEndGame(); // checks for a win or a loss
+        repaint(); // repaints the game
+    }
+
+    // used in the move method to check whether or not the number is at the while loop limit
+    private boolean checkLimit(int num, boolean isRising) {
+        if (isRising) {
+            return num < 3;
+        } else {
+            return num > 0;
+        }
+    }
+
+    // used in the move method to check whether or not the while loop is at its last iteration
+    private boolean checkAlmost(int num, boolean isRising) {
+        if (isRising) {
+            return num == 2;
+        } else {
+            return num == 1;
+        }
     }
 
 }
