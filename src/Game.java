@@ -37,15 +37,8 @@ public class Game extends JFrame {
         }
 
         // generates two random spots at the beginning of the game
-        //getRandomSpot();
-        //getRandomSpot();
-
-        buttonList.get(0).changeValue(8);
-        tileIndices.replace(0, true);
-        buttonList.get(1).changeValue(4);
-        tileIndices.replace(1, true);
-        buttonList.get(3).changeValue(8);
-        tileIndices.replace(3, true);
+        getRandomSpot();
+        getRandomSpot();
 
         // sets the color, font, and size parameters  for the game
         setBackground(Color.decode("#717171"));
