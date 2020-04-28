@@ -15,6 +15,25 @@ public class Tile extends JFrame {
 
     static int SIZE = 125;
 
+    public Tile(int x, int row, int column) {
+        // sets the initial value to the given number, or 0 if the number is less than 0
+        if (x < 0) {
+            this.value = 0;
+        } else {
+            this.value = x;
+        }
+
+        // sets row and column equal to specific numbers to fit the screen
+        this.row = (SIZE * row) + 20;
+        this.column = (SIZE * column) + 35;
+
+        // sets the specific background color
+        background = new Color(0x999999);
+
+        // sets the initial string to empty
+        number = "";
+    }
+
     public Tile(int row, int column) {
         this.value = 0; // sets the initial value to 0
 
@@ -84,9 +103,11 @@ public class Tile extends JFrame {
 
     // changes the value of the Tile
     public void changeValue(int x) {
-        value = x; // sets the value equal to the given int
-        number = String.valueOf(value); // changes the string to the appropriate value
-        changeColor(); // changes the color based on the new value
+        if (x > 0) {
+            value = x; // sets the value equal to the given int
+            number = String.valueOf(value); // changes the string to the appropriate value
+            changeColor(); // changes the color based on the new value
+        }
     }
 
     // returns the value of the tile

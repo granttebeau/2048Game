@@ -24,7 +24,7 @@ public class Game extends JFrame {
     static int LEFT = 3;
     static int DOWN = 4;
 
-    Game() {
+    public Game() {
         // adding tile spaces to the game
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
