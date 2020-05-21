@@ -37,8 +37,10 @@ public class Game extends JFrame {
         }
 
         // generates two random spots at the beginning of the game
-        getRandomSpot();
-        getRandomSpot();
+        buttonList.get(3).changeValue(2);
+        tileIndices.replace(3, true);
+
+        System.out.print(tileIndices + "\n");
 
         // sets the color, font, and size parameters  for the game
         setBackground(Color.decode("#717171"));
@@ -428,7 +430,7 @@ public class Game extends JFrame {
                     if (carryVal > 0) { // if carryVal isn't -1, set it the farthest to the given direction
                         setFarthest(setFarVal, carryVal, dir);
                     }
-                    if (!pastOne) { // if the loop isn't on its first iteration, set moved equal to true
+                    if (pastOne) { // if the loop isn't on its first iteration, set moved equal to true
                         moved = true;
                     }
                     carryVal = t1Val; // sets a new value for carryVal
@@ -449,9 +451,11 @@ public class Game extends JFrame {
             }
         }
 
+
         if (moved) { // if there has been a move, get a random spot
             getRandomSpot();
         }
+        System.out.print(tileIndices + "\n");
         isEndGame(); // checks for a win or a loss
         repaint(); // repaints the game
     }

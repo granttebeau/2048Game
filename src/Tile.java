@@ -103,7 +103,7 @@ public class Tile extends JFrame {
 
     // changes the value of the Tile
     public void changeValue(int x) {
-        if (x > 0) {
+        if (x >= 0) {
             value = x; // sets the value equal to the given int
             number = String.valueOf(value); // changes the string to the appropriate value
             changeColor(); // changes the color based on the new value

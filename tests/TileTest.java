@@ -30,7 +30,7 @@ public class TileTest {
         Tile tile2 = new Tile(-1, 3, 0); // initializes a tile
         assertEquals(0, tile2.getValue()); // checks to see if the value was set to 0 with the invalid number
         tile2.changeValue(1024); // changes the value of the tile
-        assertEquals(1024, tile2.getValue());  // checks to see if getValue accounted for the change 
+        assertEquals(1024, tile2.getValue());  // checks to see if getValue accounted for the change
 
         Tile tile3 = new Tile(1, 2); // initializes a tile without a value
         assertEquals(0, tile3.getValue()); // checks if the initialized number was correct
